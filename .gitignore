@@ -6,3 +6,31 @@
 **/node_modules/
 **/.next/
 .env
+
+# SECURITY: Never commit secret files
+# Unencrypted env files with credentials
+secrets/*.env
+secrets/**/*.env
+!secrets/README.md
+
+# Terraform sensitive files
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform/
+crash.log
+
+# SOPS encrypted files should be committed, but not unencrypted
+# *.dec.* files are decrypted versions - never commit
+*.dec.*
+*.decrypted.*
+
+# Private keys
+*.pem
+*.key
+id_rsa*
+*.p12
+
+# Package lock files should be committed for reproducibility
+# But not .npmrc with tokens
+.npmrc
