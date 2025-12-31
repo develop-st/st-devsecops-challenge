@@ -24,6 +24,11 @@ jobs:
         working-directory: backend
         run: ./gradlew clean build
 
+      # SECURITY: Run dependency vulnerability scan
+      - name: Backend - dependency check
+        working-directory: backend
+        run: ./gradlew dependencyCheckAnalyze || true
+
       - name: Frontend - setup Node
         uses: actions/setup-node@v4
         with:
@@ -32,17 +37,23 @@ jobs:
       - name: Frontend - install & build
         working-directory: frontend
         run: |
-          npm install
+          npm ci
           npm run build
 
+      # SECURITY: Run npm audit to check for vulnerabilities
+      - name: Frontend - security audit
+        working-directory: frontend
+        run: npm audit --audit-level=high || true
+
+      # SECURITY FIX: Use OIDC instead of long-lived access keys
+      # Original code leaked env vars with: env | sort | sed -n '1,120p'
+      # This exposed AWS credentials in logs!
       - name: Configure AWS credentials
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-central-1
-        run: |
-          echo "Configured AWS creds for region $AWS_DEFAULT_REGION"
-          env | sort | sed -n '1,120p'
+        if: github.ref == 'refs/heads/main'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-central-1
 
       - name: Deploy (placeholder)
         if: github.ref == 'refs/heads/main'
