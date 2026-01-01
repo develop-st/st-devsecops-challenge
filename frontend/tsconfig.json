@@ -8,7 +8,9 @@
     ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
+    // SECURITY FIX: Enable strict mode for better type safety
+    // Was: false - allows unsafe type coercion
+    "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -16,7 +18,10 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
+    // ADDED: Additional strict checks
+    "noImplicitAny": true,
+    "noImplicitReturns": true
   },
   "include": [
     "next-env.d.ts",
